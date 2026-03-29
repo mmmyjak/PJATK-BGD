@@ -1,0 +1,4 @@
+# Problem Statement & Data Quality Risks
+
+## Initial Problem Statement (Analytical Goal)
+The primary analytical goal of this project is to build an automated, scalable ELT (Extract, Load, Transform) pipeline that processes approximately 10 GB of raw, historical US flight data. The objective is to transform this raw data into business-ready metrics to evaluate airline punctuality and route reliability. By establishing a Medallion Architecture (Bronze, Silver, Gold), the pipeline enables end-users and downstream BI tools to identify the most delayed carriers and the most unreliable flight routes, ultimately supporting data-driven decisions for flight scheduling and consumer travel planning.

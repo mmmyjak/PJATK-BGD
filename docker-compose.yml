@@ -1,0 +1,57 @@
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: bgd_postgres
+    env_file:
+      - /.env
+    command: ["postgres", "-c", "wal_level=logical", "-c", "max_replication_slots=4", "-c", "max_wal_senders=4"]
+    volumes:
+      - ./data/postgres:/var/lib/postgresql/data
+      - ./db/init.sql:/docker-entrypoint-initdb.d
+    networks:
+      - bgd_projekt
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-bgd_db}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: bgd_pgadmin
+    env_file:
+      - /.env
+    ports:
+      - "8080:80"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - bgd_projekt
+    volumes:
+      - ./data/pgadmin:/var/lib/pgadmin
+
+  pyspark:
+    build:
+      context: .
+      dockerfile: Dockerfile.pyspark
+    container_name: bgd_pyspark
+    env_file:
+      - /.env
+    environment:
+      - POSTGRES_HOST=postgres
+      - JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64
+      - PATH=/usr/lib/jvm/java-21-openjdk-amd64/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - bgd_projekt
+    volumes:
+      - ./src:/app/src
+      - ./data:/app/data
+    command: sleep infinity
+
+networks:
+  bgd_projekt:
+    driver: bridge
