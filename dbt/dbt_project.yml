@@ -1,0 +1,21 @@
+name: airline_medallion
+version: 1.0.0
+config-version: 2
+
+profile: airline_medallion
+
+model-paths: ["models"]
+macro-paths: ["macros"]
+
+target-path: ../data/dbt/target
+packages-install-path: ../data/dbt/dbt_packages
+clean-targets:
+  - ../data/dbt/target
+  - ../data/dbt/dbt_packages
+
+models:
+  airline_medallion:
+    +materialized: view
+    gold:
+      +schema: gold
+      +materialized: table

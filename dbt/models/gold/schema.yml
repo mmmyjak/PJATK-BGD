@@ -1,0 +1,26 @@
+version: 2
+
+models:
+  - name: monthly_carrier_performance
+    columns:
+      - name: flight_year
+        tests:
+          - not_null
+      - name: flight_month
+        tests:
+          - not_null
+      - name: op_carrier
+        tests:
+          - not_null
+
+  - name: yearly_route_reliability
+    columns:
+      - name: flight_year
+        tests:
+          - not_null
+      - name: origin
+        tests:
+          - not_null
+      - name: dest
+        tests:
+          - not_null

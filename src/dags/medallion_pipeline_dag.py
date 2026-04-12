@@ -47,12 +47,20 @@ with DAG(
         append_env=True,
     )
 
-    gold_aggregate = BashOperator(
-        task_id="gold_aggregate",
-        bash_command="docker exec -w /app/src bgd_pyspark python -u gold_aggregate.py",
-        execution_timeout=timedelta(minutes=40),
+    dbt_run_gold = BashOperator(
+        task_id="dbt_run_gold",
+        bash_command="docker exec -w /app/dbt bgd_pyspark dbt run --profiles-dir /app/dbt --select gold",
+        execution_timeout=timedelta(minutes=30),
         env=TASK_ENV,
         append_env=True,
     )
 
-    bronze_ingest >> silver_clean >> gold_aggregate
+    dbt_test_gold = BashOperator(
+        task_id="dbt_test_gold",
+        bash_command="docker exec -w /app/dbt bgd_pyspark dbt test --profiles-dir /app/dbt --select gold",
+        execution_timeout=timedelta(minutes=15),
+        env=TASK_ENV,
+        append_env=True,
+    )
+
+    bronze_ingest >> silver_clean >> dbt_run_gold >> dbt_test_gold

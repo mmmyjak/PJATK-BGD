@@ -5,6 +5,8 @@ from pyspark.sql.functions import col, year, month, count, sum, avg, max, curren
 
 load_dotenv()
 
+# was replaced with data build tool
+
 RUN_PROFILE = "demo"
 # RUN_PROFILE = "full"
 

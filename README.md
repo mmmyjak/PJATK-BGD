@@ -14,7 +14,15 @@ A project implementing an automated Extract, Load, Transform (ELT) data pipeline
 * **`src/`** - Main data pipeline code (PySpark):
   * `bronze_ingest.py` - Ingests raw CSV files and appends them to the database.
   * `silver_clean.py` - Data cleansing, type casting, and NULL handling (incremental load).
-  * `gold_aggregate.py` - Business aggregations (JOIN/GroupBy) for airline and route performance (incremental load).
+  * `gold_aggregate.py` - Business aggregations (reference only; Gold layer is now handled by dbt).
+  * `dags/medallion_pipeline_dag.py` - Airflow DAG defining the full pipeline as a single entry point.
+* **`dbt/`** - Gold layer transformation declarations (dbt-postgres):
+  * `dbt_project.yml` - Project config; artifacts written to `data/dbt/` (gitignored).
+  * `profiles.yml` - Connection profile reading from environment variables.
+  * `models/sources.yml` - Declares `silver.flights` as the dbt source.
+  * `models/gold/monthly_carrier_performance.sql` - Incremental model: carrier KPIs by month.
+  * `models/gold/yearly_route_reliability.sql` - Incremental model: route reliability by year.
+  * `models/gold/schema.yml` - Data quality tests (`not_null`) for Gold models.
 
 ## 🚀 How to Run the Project
 

@@ -41,6 +41,7 @@ services:
     environment:
       - POSTGRES_HOST=postgres
       - JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64
+      - DBT_LOG_PATH=/app/data/dbt/logs
       - PATH=/usr/lib/jvm/java-21-openjdk-amd64/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
     depends_on:
       postgres:
@@ -49,6 +50,7 @@ services:
       - bgd_projekt
     volumes:
       - ./src:/app/src
+      - ./dbt:/app/dbt
       - ./data:/app/data
     command: sleep infinity
 

@@ -24,6 +24,9 @@ dist/
 .mypy_cache/
 .ruff_cache/
 
+# dbt local metadata
+dbt/.user.yml
+
 # IDE/editor files
 .vscode/
 .idea/

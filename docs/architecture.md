@@ -17,7 +17,10 @@ graph TD
     end
 
     subgraph Execution Environment
-        B((PySpark Workspace<br/>Python 3.11 + Java 21))
+        subgraph PySpark Container [bgd_pyspark]
+            B((PySpark<br/>Python 3.11 + Java 21))
+            DBT[dbt-postgres<br/>Incremental Models]
+        end
     end
 
     subgraph PostgreSQL Database
@@ -31,9 +34,10 @@ graph TD
     %% Control Flow (Orchestration)
     Airflow -.->|1. docker exec bronze_ingest.py| B
     Airflow -.->|2. docker exec silver_clean.py| B
-    Airflow -.->|3. docker exec gold_aggregate.py| B
+    Airflow -.->|3. docker exec dbt run| DBT
+    Airflow -.->|4. docker exec dbt test| DBT
 
     %% Data Flow (ELT Process)
     B ==>|Ingest & Append| C
     C ==>|PySpark Reads & Cleans| D
-    D ==>|PySpark Reads & Aggregates| E
+    D ==>|dbt Reads & Aggregates<br/>delete+insert incremental| E
