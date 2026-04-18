@@ -54,6 +54,74 @@ services:
       - ./data:/app/data
     command: sleep infinity
 
+  kafka:
+    image: apache/kafka:3.9.1
+    container_name: bgd_kafka
+    environment:
+      - KAFKA_NODE_ID=1
+      - KAFKA_PROCESS_ROLES=broker,controller
+      - KAFKA_LISTENERS=PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093
+      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092
+      - KAFKA_CONTROLLER_LISTENER_NAMES=CONTROLLER
+      - KAFKA_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      - KAFKA_CONTROLLER_QUORUM_VOTERS=1@kafka:9093
+      - KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1
+      - KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR=1
+      - KAFKA_TRANSACTION_STATE_LOG_MIN_ISR=1
+      - KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS=0
+      - KAFKA_NUM_PARTITIONS=1
+      - KAFKA_CLUSTER_ID=4L6g3nShT-eMCtK--X86sw
+    networks:
+      - bgd_projekt
+    ports:
+      - "9092:9092"
+
+  kafka-source-producer:
+    build:
+      context: .
+      dockerfile: Dockerfile.kafka
+    container_name: bgd_kafka_source_producer
+    environment:
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+      - KAFKA_TOPIC=flights.ingest.request
+      - SOURCE_DIR=/app/data/source
+      - STATE_FILE=/app/data/kafka/producer_state.json
+      - POLL_SECONDS=10
+    depends_on:
+      - kafka
+    networks:
+      - bgd_projekt
+    volumes:
+      - ./src:/app/src
+      - ./data:/app/data
+    command: python -u src/kafka_source_producer.py
+    restart: unless-stopped
+
+  kafka-airflow-trigger:
+    build:
+      context: .
+      dockerfile: Dockerfile.kafka
+    container_name: bgd_kafka_airflow_trigger
+    env_file:
+      - ./.env
+    environment:
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+      - KAFKA_TOPIC=flights.ingest.request
+      - KAFKA_GROUP_ID=airflow-trigger-consumer
+      - AIRFLOW_BASE_URL=http://airflow-webserver:8080
+      - AIRFLOW_DAG_ID=medallion_airline_pipeline_kafka
+      - AIRFLOW_USERNAME=${AIRFLOW_ADMIN_USER:-admin}
+      - AIRFLOW_PASSWORD=${AIRFLOW_ADMIN_PASSWORD:-admin}
+    depends_on:
+      - kafka
+      - airflow-webserver
+    networks:
+      - bgd_projekt
+    volumes:
+      - ./src:/app/src
+    command: python -u src/kafka_airflow_trigger.py
+    restart: unless-stopped
+
   airflow-init:
     image: apache/airflow:3.2.0
     container_name: bgd_airflow_init

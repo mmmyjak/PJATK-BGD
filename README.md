@@ -16,6 +16,9 @@ A project implementing an automated Extract, Load, Transform (ELT) data pipeline
   * `silver_clean.py` - Data cleansing, type casting, and NULL handling (incremental load).
   * `gold_aggregate.py` - Business aggregations (reference only; Gold layer is now handled by dbt).
   * `dags/medallion_pipeline_dag.py` - Airflow DAG defining the full pipeline as a single entry point.
+  * `dags/medallion_pipeline_kafka_dag.py` - Airflow DAG triggered automatically from Kafka events.
+  * `kafka_source_producer.py` - Watches source files and publishes file events to Kafka.
+  * `kafka_airflow_trigger.py` - Consumes Kafka events and triggers the Kafka Airflow DAG.
 * **`dbt/`** - Gold layer transformation declarations (dbt-postgres):
   * `dbt_project.yml` - Project config; artifacts written to `data/dbt/` (gitignored).
   * `profiles.yml` - Connection profile reading from environment variables.
@@ -32,3 +35,12 @@ The project is fully containerized to avoid local environment issues (e.g., Java
 2. Start the infrastructure (PostgreSQL + Spark Workspace) in the background:
    ```bash
    docker-compose up -d --build
+  ```
+
+Optional Kafka auto-trigger mode (in addition to manual Airflow triggering):
+
+```bash
+docker compose up -d kafka kafka-source-producer kafka-airflow-trigger
+```
+
+This keeps your existing manual DAG (`medallion_airline_pipeline`) and adds automatic triggering through `medallion_airline_pipeline_kafka`.

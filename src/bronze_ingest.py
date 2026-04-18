@@ -45,8 +45,18 @@ def main():
     script_dir = os.path.dirname(os.path.abspath(__file__))
     source_dir = os.path.join(script_dir, "../data/source")
     source_dir = os.path.abspath(source_dir)
-    
-    all_files = glob.glob(os.path.join(source_dir, "*.csv"))
+
+    target_file = os.getenv("TARGET_FILE", "").strip()
+
+    if target_file:
+        file_path = target_file if os.path.isabs(target_file) else os.path.join(source_dir, target_file)
+        file_path = os.path.abspath(file_path)
+        if not os.path.exists(file_path):
+            print(f"Target file does not exist: {file_path}")
+            return
+        all_files = [file_path]
+    else:
+        all_files = glob.glob(os.path.join(source_dir, "*.csv"))
     
     if not all_files:
         print(f"No files found in folder {source_dir}. Exiting.")

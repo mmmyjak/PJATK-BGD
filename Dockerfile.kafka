@@ -1,0 +1,10 @@
+FROM python:3.11-slim
+
+WORKDIR /app
+
+COPY requirements.kafka.txt .
+RUN pip install --no-cache-dir -r requirements.kafka.txt
+
+COPY src/ ./src/
+
+ENV PYTHONUNBUFFERED=1
