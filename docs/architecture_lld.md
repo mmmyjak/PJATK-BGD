@@ -1,8 +1,4 @@
-# Project Architecture & Data Model
-
-This document outlines the high-level architecture of the ELT pipeline and the Entity-Relationship Diagram (ERD) of the Medallion Architecture implemented in PostgreSQL.
-
-## 1. High-Level Pipeline Architecture
+# Pipeline Architecture LLD
 
 The pipeline extracts raw CSV data (~10 GB), processes it using Apache Spark (PySpark) within an isolated Docker container, and loads it incrementally into a PostgreSQL data warehouse. The workflow is orchestrated by Apache Airflow and additionally supports a Kafka-triggered DAG path for automatic starts.
 
