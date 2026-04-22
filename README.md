@@ -6,7 +6,8 @@ A project implementing an automated Extract, Load, Transform (ELT) data pipeline
 
 * **`docs/`** - Analytical and design documentation (Deliverables):
   * [`problem-statement.md`](docs/problem-statement.md) - The main business and analytical goal of the project.
-  * [`architecture.md`](docs/architecture.md) - High-level architecture diagram of the solution (Mermaid).
+  * [`architecture_hla.md`](docs/architecture_hla.md) - High-level architecture of the solution (Mermaid).
+  * [`architecture_lld.md`](docs/architecture_lld.md) - Low-level design of the solution (Mermaid).
   * [`erd.md`](docs/erd.md) - Entity-Relationship Diagram (ERD) of the PostgreSQL database (Mermaid).
   * [`data_quality_risks.md`](docs/data_quality_risks.md) - Identification of 3 main data quality risks (Ingestion, Transformation, Scale).
 * **`db/`** - Database scripts:
