@@ -1,0 +1,78 @@
+product_name: Airline Delay and Cancellation
+product_owner: Mateusz Myjak
+product_purpose: This data product helps solve the problem of having flight data spread out and hard to compare in one place. It gives a clear monthly summary of how different airlines perform, especially for delays and cancellations. It is useful for simple trend analysis, carrier benchmarking, and creating reports for planning and operational improvements.
+
+data_sources:
+  - name: Airline Delay and Cancellation Data
+    type: CSV files
+    refresh: yearly (sometimes monthly)
+
+schema:
+  table_name: gold_gold.monthly_carrier_performance
+  columns:
+    - name: flight_year
+      type: integer
+      description: The calendar year
+      example: 2018
+    - name: flight_month
+      type: integer
+      description: The month of operation
+      example: 11
+    - name: op_carrier
+      type: text
+      description: The Operating Carrier (code)
+      example: MQ
+    - name: total_flights
+      type: bigint
+      description: Total number of flights operated by that carrier in that month
+      example: 67
+    - name: cancelled_flights
+      type: bigint
+      description: Number of scheduled flights that were cancelled
+      example: 1
+    - name: avg_departure_delay
+      type: double
+      description: Average departure delay in minutes
+      example: 14.11
+    - name: total_weather_delay_mins
+      type: double
+      description: Total minutes of delay specifically attributed to weather
+      example: 108
+    - name: _aggregated_at
+      type: timestamp
+      description: Metadata timestamp showing when this row was calculated
+      example: 2026-04-12 18:46:52.225163+00
+
+refresh_frequency: Monthly
+update_trigger: Airflow
+storage_location: Postgres DB
+expected_volume: 60-80 rows per month (depending on the number of carriers)
+dependencies: file drop
+
+access_method:
+  location: public GitHub repository
+  url: https://github.com/mmmyjak/PJATK-BGD
+  how_to_access: clone repository, run the stack via docker compose and trigger airflow
+  credentials_required: false
+  example_table_name: gold_gold.monthly_carrier_performance
+
+quality_metrics:
+  - metric: Completeness - required fields
+    value: 100%
+  - metric: Uniqueness - carrier / month / year combination key
+    value: 100%
+  - metric: Validity - test execution reliability
+    value: 100%
+
+limitations_and_risks:
+  - Latency or update limitations: Data is aggregated monthly and only updates when the pipeline is manually triggered (or via Kafka events if configured). There is no real-time data ingestion, so the product reflects historical patterns, not live flight operations.
+  - Usage restrictions or assumptions: The product assumes source CSV files are correctly formatted and placed in the correct directory. It is designed for historical trend analysis and carrier benchmarking, not for operational decision-making requiring real-time data. Users should validate assumptions about carrier definitions and delay classification before relying on the data for critical business decisions.
+
+example_usage:
+  business_question: Which airline carriers had the highest average departure delays in a specific month, and how many flights were cancelled?
+  sql_query: |
+    SELECT op_carrier, flight_month, total_flights, cancelled_flights, avg_departure_delay, total_weather_delay_mins
+    FROM gold_gold.monthly_carrier_performance
+    WHERE flight_year = 2018 AND flight_month = 6
+    ORDER BY avg_departure_delay DESC
+    LIMIT 10;

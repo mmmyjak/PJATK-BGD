@@ -2,6 +2,8 @@
 
 A project implementing an automated Extract, Load, Transform (ELT) data pipeline for historical US commercial flight data. The solution is based on the Medallion Architecture (Bronze, Silver, Gold) utilizing **Apache Spark (PySpark)** running in a **Docker** container and a **PostgreSQL** data warehouse.
 
+* **[`data_product_contract.yaml`](data_product_contract.yaml)** - Data Product Contract describing the product name, owner, purpose, schema, access method, quality metrics, limitations, and example usage.
+
 ## 📂 Repository Structure
 
 * **`docs/`** - Analytical and design documentation (Deliverables):
@@ -10,6 +12,7 @@ A project implementing an automated Extract, Load, Transform (ELT) data pipeline
   * [`architecture_lld.md`](docs/architecture_lld.md) - Low-level design of the solution (Mermaid).
   * [`erd.md`](docs/erd.md) - Entity-Relationship Diagram (ERD) of the PostgreSQL database (Mermaid).
   * [`data_quality_risks.md`](docs/data_quality_risks.md) - Identification of 3 main data quality risks (Ingestion, Transformation, Scale).
+  * [`data_quality_metrics.md`](docs/data_quality_metrics.md) - Data Quality metrics for the Gold product (Validity, Uniqueness, Completeness).
 * **`db/`** - Database scripts:
   * `001_init_schemas.sql` - Script initializing schemas (bronze, silver, gold) and log tables for incremental loading.
 * **`src/`** - Main data pipeline code (PySpark):
